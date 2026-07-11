@@ -215,8 +215,15 @@ let isMockLoggedIn = false;
 let isClerkActive = false;
 let clerkInstance = null;
 
-// Replace with a dummy Clerk Publishable Key for initialization test
-const CLERK_PUBLISHABLE_KEY = "pk_test_Y2xlcmsuYWNjb3VudHMuZGV2JA";
+// Replace with a dummy Clerk Publishable Key for initialization test, or look in localStorage/URL
+let CLERK_PUBLISHABLE_KEY = localStorage.getItem("CLERK_PUBLISHABLE_KEY") || "pk_test_Y2xlcmsuYWNjb3VudHMuZGV2JA";
+
+// Allow setting the key via query param for testing: ?clerk_key=pk_test_...
+const urlParamsForKey = new URLSearchParams(window.location.search);
+if (urlParamsForKey.has("clerk_key")) {
+    CLERK_PUBLISHABLE_KEY = urlParamsForKey.get("clerk_key");
+    localStorage.setItem("CLERK_PUBLISHABLE_KEY", CLERK_PUBLISHABLE_KEY);
+}
 
 // 3. App Controller Initialization
 window.addEventListener("DOMContentLoaded", async () => {
@@ -290,9 +297,7 @@ function setupRouter() {
 // 5. Authentication Initialization (Clerk with Mock Fallback)
 async function initAuth() {
     const loadingSpinner = document.getElementById("auth-loading-spinner");
-    const clerkUserBtn = document.getElementById("clerk-user-button");
     const clerkSignBtn = document.getElementById("clerk-signin-btn");
-    const fallbackUi = document.getElementById("fallback-auth-ui");
 
     // Check if Clerk object exists from CDN script
     if (window.Clerk) {
@@ -303,36 +308,60 @@ async function initAuth() {
             isClerkActive = true;
             loadingSpinner.classList.add("hidden");
             
-            // Render Clerk user button or sign in triggers
-            if (clerkInstance.user) {
-                currentUser = {
-                    name: clerkInstance.user.fullName,
-                    email: clerkInstance.user.primaryEmailAddress.emailAddress,
-                    avatar: clerkInstance.user.imageUrl
-                };
-                clerkInstance.mountUserButton(clerkUserBtn);
-                clerkSignBtn.classList.add("hidden");
-            } else {
-                currentUser = null;
-                clerkUserBtn.innerHTML = "";
-                clerkSignBtn.classList.remove("hidden");
+            // Listen for auth state changes
+            clerkInstance.addListener(({ user }) => {
+                const clerkUserBtn = document.getElementById("clerk-user-button");
+                const clerkUserInfo = document.getElementById("clerk-user-info");
+                const clerkUsername = document.getElementById("clerk-username");
                 
-                clerkSignBtn.querySelector("button").addEventListener("click", () => {
+                if (user) {
+                    currentUser = {
+                        name: user.fullName || `${user.firstName || ''} ${user.lastName || ''}`.trim() || "User",
+                        email: user.primaryEmailAddress ? user.primaryEmailAddress.emailAddress : "",
+                        avatar: user.imageUrl
+                    };
+                    
+                    if (clerkUsername) {
+                        clerkUsername.textContent = user.firstName || user.fullName || "User";
+                    }
+                    
+                    if (clerkUserInfo) {
+                        clerkUserInfo.classList.remove("hidden");
+                    }
+                    
+                    clerkSignBtn.classList.add("hidden");
+                    
+                    if (clerkUserBtn) {
+                        clerkInstance.mountUserButton(clerkUserBtn);
+                    }
+                } else {
+                    currentUser = null;
+                    if (clerkUserInfo) {
+                        clerkUserInfo.classList.add("hidden");
+                    }
+                    if (clerkUserBtn) {
+                        clerkUserBtn.innerHTML = "";
+                    }
+                    clerkSignBtn.classList.remove("hidden");
+                }
+                
+                // Sync checkout view if route is active
+                if (window.location.hash === "#checkout") {
+                    renderCheckoutPage();
+                }
+            });
+
+            // Wire Sign In triggers
+            clerkSignBtn.querySelector("button").addEventListener("click", () => {
+                clerkInstance.openSignIn();
+            });
+            
+            // Handle checkout page login trigger
+            const checkoutLoginTrigger = document.getElementById("checkout-login-trigger");
+            if (checkoutLoginTrigger) {
+                checkoutLoginTrigger.addEventListener("click", () => {
                     clerkInstance.openSignIn();
                 });
-                
-                // Handle checkout page login trigger
-                const checkoutLoginTrigger = document.getElementById("checkout-login-trigger");
-                if (checkoutLoginTrigger) {
-                    checkoutLoginTrigger.addEventListener("click", () => {
-                        clerkInstance.openSignIn();
-                    });
-                }
-            }
-
-            // Sync checkout view if route is active
-            if (window.location.hash === "#checkout") {
-                renderCheckoutPage();
             }
 
         } catch (err) {
