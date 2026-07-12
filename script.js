@@ -215,8 +215,8 @@ let isMockLoggedIn = false;
 let isClerkActive = false;
 let clerkInstance = null;
 
-// Replace with a dummy Clerk Publishable Key for initialization test, or look in localStorage/URL
-let CLERK_PUBLISHABLE_KEY = localStorage.getItem("CLERK_PUBLISHABLE_KEY") || "pk_test_Y2xlcmsuYWNjb3VudHMuZGV2JA";
+// Replace with the valid Clerk Publishable Key from taifood project
+let CLERK_PUBLISHABLE_KEY = localStorage.getItem("CLERK_PUBLISHABLE_KEY") || "pk_test_Z3JhbmQtcXVldHphbC0yLmNsZXJrLmFjY291bnRzLmRldiQ";
 
 // Allow setting the key via query param for testing: ?clerk_key=pk_test_...
 const urlParamsForKey = new URLSearchParams(window.location.search);
@@ -227,6 +227,11 @@ if (urlParamsForKey.has("clerk_key")) {
 
 // 3. App Controller Initialization
 window.addEventListener("DOMContentLoaded", async () => {
+    // Convert USD prices in productsData to INR (Rs.) by multiplying by 80
+    productsData.forEach(p => {
+        p.price = p.price * 80;
+    });
+    
     loadCartFromLocalStorage();
     setupRouter();
     setupCartActions();
@@ -294,15 +299,35 @@ function setupRouter() {
     });
 }
 
+function waitForClerk() {
+    return new Promise((resolve) => {
+        if (window.Clerk) {
+            resolve(window.Clerk);
+            return;
+        }
+        let attempts = 0;
+        const interval = setInterval(() => {
+            attempts++;
+            if (window.Clerk) {
+                clearInterval(interval);
+                resolve(window.Clerk);
+            } else if (attempts > 50) { // 2.5 seconds timeout
+                clearInterval(interval);
+                resolve(null);
+            }
+        }, 50);
+    });
+}
+
 // 5. Authentication Initialization (Clerk with Mock Fallback)
 async function initAuth() {
     const loadingSpinner = document.getElementById("auth-loading-spinner");
     const clerkSignBtn = document.getElementById("clerk-signin-btn");
 
-    // Check if Clerk object exists from CDN script
-    if (window.Clerk) {
+    const clerk = await waitForClerk();
+    if (clerk) {
         try {
-            clerkInstance = window.Clerk;
+            clerkInstance = clerk;
             // Load Clerk
             await clerkInstance.load({ publishableKey: CLERK_PUBLISHABLE_KEY });
             isClerkActive = true;
@@ -353,14 +378,14 @@ async function initAuth() {
 
             // Wire Sign In triggers
             clerkSignBtn.querySelector("button").addEventListener("click", () => {
-                clerkInstance.openSignIn();
+                clerkInstance.redirectToSignIn({ redirectUrl: window.location.href });
             });
             
             // Handle checkout page login trigger
             const checkoutLoginTrigger = document.getElementById("checkout-login-trigger");
             if (checkoutLoginTrigger) {
                 checkoutLoginTrigger.addEventListener("click", () => {
-                    clerkInstance.openSignIn();
+                    clerkInstance.redirectToSignIn({ redirectUrl: window.location.href });
                 });
             }
 
@@ -390,8 +415,8 @@ function activateMockAuth() {
     function loginMock() {
         isMockLoggedIn = true;
         currentUser = {
-            name: "Girish Kumar",
-            email: "girish@domain.com",
+            name: "Girish Naik",
+            email: "girish.naik@domain.com",
             avatar: "https://picsum.photos/100/100?random=50"
         };
 
@@ -440,6 +465,13 @@ function loadCartFromLocalStorage() {
     if (savedCart) {
         try {
             cart = JSON.parse(savedCart);
+            // Sync cart prices with productsData (rupee-converted)
+            cart.forEach(item => {
+                const prod = productsData.find(p => p.id === item.id);
+                if (prod) {
+                    item.price = prod.price;
+                }
+            });
         } catch (e) {
             cart = [];
         }
@@ -454,14 +486,24 @@ function saveCartToLocalStorage() {
 
 function updateCartNavbarBadge() {
     const badge = document.getElementById("cart-count");
+    const totalEl = document.getElementById("cart-nav-total");
     if (!badge) return;
     
     const count = cart.reduce((sum, item) => sum + item.qty, 0);
+    const totals = getCartTotals();
+    
     if (count > 0) {
         badge.textContent = count;
         badge.classList.remove("hidden");
+        if (totalEl) {
+            totalEl.textContent = `₹${totals.subtotal.toFixed(2)}`;
+            totalEl.classList.remove("hidden");
+        }
     } else {
         badge.classList.add("hidden");
+        if (totalEl) {
+            totalEl.classList.add("hidden");
+        }
     }
 }
 
@@ -512,7 +554,7 @@ function removeFromCart(productId) {
 
 function getCartTotals() {
     const subtotal = cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
-    const shipping = subtotal > 150.00 || subtotal === 0 ? 0.00 : 15.00;
+    const shipping = subtotal > 10000.00 || subtotal === 0 ? 0.00 : 150.00;
     const tax = subtotal * 0.18; // 18% GST/tax
     const total = subtotal + shipping + tax;
     
@@ -545,7 +587,7 @@ function renderFeaturedProducts() {
                     <span class="rating-count">(${p.reviews})</span>
                 </div>
                 <div class="prod-footer">
-                    <span class="prod-price">$${p.price.toFixed(2)}</span>
+                    <span class="prod-price">₹${p.price.toFixed(2)}</span>
                     <button class="add-cart-icon-btn" onclick="triggerAddToCart('${p.id}')" title="Add to Cart">
                         <span class="material-symbols-rounded">add_shopping_cart</span>
                     </button>
@@ -611,7 +653,7 @@ function renderAllProducts() {
                     <span class="rating-count">(${p.reviews})</span>
                 </div>
                 <div class="prod-footer">
-                    <span class="prod-price">$${p.price.toFixed(2)}</span>
+                    <span class="prod-price">₹${p.price.toFixed(2)}</span>
                     <button class="add-cart-icon-btn" onclick="triggerAddToCart('${p.id}')" title="Add to Cart">
                         <span class="material-symbols-rounded">add_shopping_cart</span>
                     </button>
@@ -653,7 +695,7 @@ function renderProductDetail(id) {
                 <span class="material-symbols-rounded">star</span>
                 <span>${p.rating} • <strong>${p.reviews} Verified Reviews</strong></span>
             </div>
-            <div class="detail-price">$${p.price.toFixed(2)}</div>
+            <div class="detail-price">₹${p.price.toFixed(2)}</div>
             <p class="detail-desc">${p.desc}</p>
             
             <div class="detail-actions-row">
@@ -729,16 +771,16 @@ function renderCartPage() {
             </div>
             <div class="cart-item-details">
                 <h4>${item.title}</h4>
-                <p>Quantity: ${item.qty} • $${item.price.toFixed(2)} each</p>
+                <p>Quantity: ${item.qty} • ₹${item.price.toFixed(2)} each</p>
             </div>
             
             <div class="qty-selector">
                 <button class="qty-btn" onclick="adjustItemQuantity('${item.id}', -1)">-</button>
-                <span class="qty-input" style="padding-top:8px">${item.qty}</span>
+                <span class="qty-input">${item.qty}</span>
                 <button class="qty-btn" onclick="adjustItemQuantity('${item.id}', 1)">+</button>
             </div>
 
-            <div class="cart-item-price">$${(item.price * item.qty).toFixed(2)}</div>
+            <div class="cart-item-price">₹${(item.price * item.qty).toFixed(2)}</div>
 
             <button class="remove-cart-item-btn" onclick="triggerRemoveCartItem('${item.id}')" title="Remove Item">
                 <span class="material-symbols-rounded">delete</span>
@@ -757,19 +799,19 @@ function renderCartPage() {
             <h3>ORDER SUMMARY</h3>
             <div class="summary-row">
                 <span>Subtotal</span>
-                <span>$${totals.subtotal.toFixed(2)}</span>
+                <span>₹${totals.subtotal.toFixed(2)}</span>
             </div>
             <div class="summary-row">
                 <span>Estimated Tax (18%)</span>
-                <span>$${totals.tax.toFixed(2)}</span>
+                <span>₹${totals.tax.toFixed(2)}</span>
             </div>
             <div class="summary-row">
                 <span>Estimated Shipping</span>
-                <span>${totals.shipping === 0 ? 'FREE' : '$' + totals.shipping.toFixed(2)}</span>
+                <span>${totals.shipping === 0 ? 'FREE' : '₹' + totals.shipping.toFixed(2)}</span>
             </div>
             <div class="summary-row total-row">
                 <span>Total</span>
-                <span>$${totals.total.toFixed(2)}</span>
+                <span>₹${totals.total.toFixed(2)}</span>
             </div>
             
             <a href="#checkout" class="btn btn-primary btn-block checkout-action-btn">
@@ -816,7 +858,7 @@ function renderCheckoutPage() {
         <div class="checkout-summary-item">
             <span class="item-title">${item.title}</span>
             <span class="item-qty">x${item.qty}</span>
-            <span class="item-price">$${(item.price * item.qty).toFixed(2)}</span>
+            <span class="item-price">₹${(item.price * item.qty).toFixed(2)}</span>
         </div>
     `).join("");
 
@@ -826,19 +868,19 @@ function renderCheckoutPage() {
     totalsContainer.innerHTML = `
         <div class="summary-row">
             <span>Subtotal</span>
-            <span>$${totals.subtotal.toFixed(2)}</span>
+            <span>₹${totals.subtotal.toFixed(2)}</span>
         </div>
         <div class="summary-row">
             <span>Estimated Shipping</span>
-            <span>${totals.shipping === 0 ? 'FREE' : '$' + totals.shipping.toFixed(2)}</span>
+            <span>${totals.shipping === 0 ? 'FREE' : '₹' + totals.shipping.toFixed(2)}</span>
         </div>
         <div class="summary-row">
             <span>GST/Tax (18%)</span>
-            <span>$${totals.tax.toFixed(2)}</span>
+            <span>₹${totals.tax.toFixed(2)}</span>
         </div>
         <div class="summary-row total-row" style="margin-top: 12px; border-top:1px solid var(--border-color); padding-top:12px">
             <span>Grand Total</span>
-            <span>$${totals.total.toFixed(2)}</span>
+            <span>₹${totals.total.toFixed(2)}</span>
         </div>
     `;
 
@@ -926,7 +968,7 @@ function setupCheckoutForm() {
             // Generate Mock Invoice
             const totals = getCartTotals();
             document.getElementById("invoice-client").textContent = name;
-            document.getElementById("invoice-total").textContent = `$${totals.total.toFixed(2)}`;
+            document.getElementById("invoice-total").textContent = `₹${totals.total.toFixed(2)}`;
             
             const randomRef = Math.floor(100000 + Math.random() * 900000);
             document.getElementById("invoice-ref").textContent = `TAIZONE-${randomRef}-G`;
