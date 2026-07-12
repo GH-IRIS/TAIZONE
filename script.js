@@ -378,14 +378,22 @@ async function initAuth() {
 
             // Wire Sign In triggers
             clerkSignBtn.querySelector("button").addEventListener("click", () => {
-                clerkInstance.redirectToSignIn({ redirectUrl: window.location.href });
+                clerkInstance.redirectToSignIn({
+                    redirectUrl: window.location.href,
+                    afterSignInUrl: window.location.href,
+                    afterSignUpUrl: window.location.href
+                });
             });
             
             // Handle checkout page login trigger
             const checkoutLoginTrigger = document.getElementById("checkout-login-trigger");
             if (checkoutLoginTrigger) {
                 checkoutLoginTrigger.addEventListener("click", () => {
-                    clerkInstance.redirectToSignIn({ redirectUrl: window.location.href });
+                    clerkInstance.redirectToSignIn({
+                        redirectUrl: window.location.href,
+                        afterSignInUrl: window.location.href,
+                        afterSignUpUrl: window.location.href
+                    });
                 });
             }
 
