@@ -99,43 +99,90 @@
     <main class="app-main">
         <!-- 1. Home / Landing Page View -->
         <section id="view-home" class="route-view hidden">
-            <!-- Hero Banner -->
-            <div class="hero-banner">
-                <div class="hero-overlay"></div>
-                <div class="hero-content">
-                    <span class="hero-tag">NEW SEASON ARRIVALS</span>
-                    <h1>UPGRADE YOUR EVERYDAY GEAR</h1>
-                    <p>Discover a curated collection of tech accessories, lifestyle tools, and premium apparel designed to elevate your daily routine.</p>
-                    <div class="hero-actions">
-                        <a href="#products" class="btn btn-primary">
-                            <span>Shop Collection</span>
-                            <span class="material-symbols-rounded">arrow_right_alt</span>
-                        </a>
-                        <a href="#about" class="btn btn-secondary">Learn More</a>
+            <!-- Hero Carousel (Full Screen Crossfade) -->
+            <div class="hero-carousel" id="hero-carousel">
+                <!-- Slide 1 -->
+                <div class="carousel-slide active" style="background-image: url('https://images.unsplash.com/photo-1498049794561-7780e7231661?auto=format&fit=crop&w=1920&q=80')">
+                    <div class="hero-overlay"></div>
+                    <div class="hero-content">
+                        <span class="hero-tag">NEW SEASON ARRIVALS</span>
+                        <h1>UPGRADE YOUR EVERYDAY GEAR</h1>
+                        <p>Discover a curated collection of tech accessories, lifestyle tools, and premium apparel designed to elevate your daily routine.</p>
+                        <div class="hero-actions">
+                            <a href="#products" class="btn btn-primary">
+                                <span>Shop Collection</span>
+                                <span class="material-symbols-rounded">arrow_right_alt</span>
+                            </a>
+                            <a href="#products" class="btn btn-secondary">Learn More</a>
+                        </div>
                     </div>
+                </div>
+
+                <!-- Slide 2 -->
+                <div class="carousel-slide" style="background-image: url('https://images.unsplash.com/photo-1546435770-a3e426bf472b?auto=format&fit=crop&w=1920&q=80')">
+                    <div class="hero-overlay"></div>
+                    <div class="hero-content">
+                        <span class="hero-tag">LIMITLESS SOUND</span>
+                        <h1>ACOUSTIC EXCELLENCE</h1>
+                        <p>Immerse yourself in high-fidelity audio with our new ANC wireless headphones and earbuds engineered for audio purists.</p>
+                        <div class="hero-actions">
+                            <a href="#products" class="btn btn-primary">
+                                <span>Explore Audio</span>
+                                <span class="material-symbols-rounded">arrow_right_alt</span>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Slide 3 -->
+                <div class="carousel-slide" style="background-image: url('https://images.unsplash.com/photo-1473163928189-364b2c4e1135?auto=format&fit=crop&w=1920&q=80')">
+                    <div class="hero-overlay"></div>
+                    <div class="hero-content">
+                        <span class="hero-tag">ESSENTIAL LIFESTYLE</span>
+                        <h1>BUILT FOR THE ROAD</h1>
+                        <p>Weatherproof duffles, commuter packs, and travel accessories crafted from sustainable, rugged materials.</p>
+                        <div class="hero-actions">
+                            <a href="#products" class="btn btn-primary">
+                                <span>Shop Travel Gear</span>
+                                <span class="material-symbols-rounded">arrow_right_alt</span>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Carousel Controls -->
+                <button class="carousel-control prev" id="carousel-prev-btn" title="Previous Slide">
+                    <span class="material-symbols-rounded">chevron_left</span>
+                </button>
+                <button class="carousel-control next" id="carousel-next-btn" title="Next Slide">
+                    <span class="material-symbols-rounded">chevron_right</span>
+                </button>
+
+                <!-- Carousel Indicators -->
+                <div class="carousel-indicators">
+                    <span class="indicator-dot active" data-slide="0"></span>
+                    <span class="indicator-dot" data-slide="1"></span>
+                    <span class="indicator-dot" data-slide="2"></span>
                 </div>
             </div>
 
-            <!-- Featured Categories -->
-            <div class="categories-section container">
-                <div class="section-header">
+            <!-- Featured Categories (Horizontal Bar) -->
+            <div class="categories-bar-container container">
+                <div class="categories-bar-header">
                     <h2>SHOP BY CATEGORY</h2>
                 </div>
-                <div class="categories-grid">
-                    <div class="category-card" data-category="electronics">
-                        <div class="cat-icon-wrap"><span class="material-symbols-rounded">devices</span></div>
-                        <h3>Electronics</h3>
-                        <p>Smart accessories &amp; tech chargers</p>
+                <div class="categories-bar">
+                    <div class="category-pill" data-category="electronics">
+                        <span class="material-symbols-rounded pill-icon">devices</span>
+                        <span class="pill-title">Electronics</span>
                     </div>
-                    <div class="category-card" data-category="lifestyle">
-                        <div class="cat-icon-wrap"><span class="material-symbols-rounded">local_cafe</span></div>
-                        <h3>Lifestyle</h3>
-                        <p>Self-cleaning bottles &amp; stands</p>
+                    <div class="category-pill" data-category="lifestyle">
+                        <span class="material-symbols-rounded pill-icon">local_cafe</span>
+                        <span class="pill-title">Lifestyle</span>
                     </div>
-                    <div class="category-card" data-category="apparel">
-                        <div class="cat-icon-wrap"><span class="material-symbols-rounded">apparel</span></div>
-                        <h3>Apparel</h3>
-                        <p>Weatherproof packs &amp; footwear</p>
+                    <div class="category-pill" data-category="apparel">
+                        <span class="material-symbols-rounded pill-icon">apparel</span>
+                        <span class="pill-title">Apparel</span>
                     </div>
                 </div>
             </div>
