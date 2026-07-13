@@ -9,7 +9,7 @@
 ## 📸 Screenshots
 | Home | Cart / Checkout |
 |------|------|
-| ![Home Catalog](https://GH-IRIS.github.io/Portfolio/assets/project_checkout.jpg) | ![Cart & Checkout](https://GH-IRIS.github.io/Portfolio/assets/project_checkout.jpg) |
+| ![Home Catalog](https://github.com/GH-IRIS/TAIZONE/blob/main/e-commerce.png) |
 
 ## ✅ Features
 | Feature | Status |
