@@ -2,12 +2,12 @@
 
 > A complete shopping experience: browse → product details → working cart → Google login → checkout.
 
-🔗 **Live Demo:** https://GH-IRIS.github.io/TAIZONE/ · **Code:** https://github.com/GH-IRIS/TAIZONE
+🔗 **Live Demo:** [https://GH-IRIS.github.io/TAIZONE/](https://GH-IRIS.github.io/TAIZONE/) · **Code:** [https://github.com/GH-IRIS/TAIZONE](https://github.com/GH-IRIS/TAIZONE)
 
 ## 📸 Screenshots
-| Home | Cart |
+| Home | Cart / Checkout |
 |------|------|
-| ![Home Screenshot](https://picsum.photos/400/300?random=81) | ![Cart Screenshot](https://picsum.photos/400/300?random=82) |
+| ![Home Catalog](https://GH-IRIS.github.io/Portfolio/assets/project_checkout.jpg) | ![Cart & Checkout](https://GH-IRIS.github.io/Portfolio/assets/project_checkout.jpg) |
 
 ## ✅ Features
 | Feature | Status |
@@ -44,7 +44,7 @@ This project was built during my frontend training at **[TAP Academy](https://th
 - 🚀 **Get placed in 60 days** — dedicated placement track with daily placement drives
 - 🥽 **Augmented Reality (AR) classrooms** — concepts you can see, not just read
 - 🎤 **Weekly mock interviews** with real-time feedback
-- 👨🏫 **1-on-1 mentorship** and round-the-clock doubt support
+- 👨‍🏫 **1-on-1 mentorship** and round-the-clock doubt support
 - 💻 Courses in **Java, Python, Full Stack Development, Data Science & AI**
 
 ### ❓ FAQ

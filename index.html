@@ -40,24 +40,18 @@
                 <span class="logo-text">Tai<span class="logo-accent">Zone</span></span>
             </a>
 
-            <!-- Search Bar (Global) -->
-            <div class="search-bar-wrap">
-                <span class="material-symbols-rounded search-icon">search</span>
-                <input type="text" id="global-search" placeholder="Search products, brands...">
-            </div>
+            <!-- Collapsible Navigation & Search Wrapper -->
+            <div class="nav-menu-wrapper" id="nav-menu-wrapper">
+                <!-- Search Bar (Global) -->
+                <div class="search-bar-wrap">
+                    <span class="material-symbols-rounded search-icon">search</span>
+                    <input type="text" id="global-search" placeholder="Search products, brands...">
+                </div>
 
-            <!-- Nav Actions -->
-            <div class="header-actions">
+                <!-- Browse Action -->
                 <a href="#products" class="nav-btn-link" title="Explore Products">
                     <span class="material-symbols-rounded">storefront</span>
                     <span>Browse</span>
-                </a>
-                
-                <!-- Cart Trigger Badge -->
-                <a href="#cart" class="cart-trigger" id="cart-badge-trigger">
-                    <span class="material-symbols-rounded">shopping_cart</span>
-                    <span class="cart-count-badge hidden" id="cart-count">0</span>
-                    <span class="cart-nav-total hidden" id="cart-nav-total">₹0.00</span>
                 </a>
 
                 <!-- Clerk Auth Button Wrapper -->
@@ -91,6 +85,21 @@
                         </div>
                     </div>
                 </div>
+            </div>
+
+            <!-- Right-side actions (Cart & Mobile Toggle) -->
+            <div class="header-right-actions">
+                <!-- Cart Trigger Badge -->
+                <a href="#cart" class="cart-trigger" id="cart-badge-trigger">
+                    <span class="material-symbols-rounded">shopping_cart</span>
+                    <span class="cart-count-badge hidden" id="cart-count">0</span>
+                    <span class="cart-nav-total hidden" id="cart-nav-total">₹0.00</span>
+                </a>
+                
+                <!-- Mobile Hamburger Menu Button -->
+                <button class="mobile-toggle-btn" id="mobile-menu-toggle" aria-label="Toggle Menu">
+                    <span class="material-symbols-rounded">menu</span>
+                </button>
             </div>
         </div>
     </header>
